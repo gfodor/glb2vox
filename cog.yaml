@@ -9,4 +9,4 @@ build:
     - curl -o /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl -L "https://huggingface.co/spaces/tencent/Hunyuan3D-2/resolve/main/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl" && pip install /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl
     - mkdir -p /usr/local/bin/
 
-predict: "pipeline/predict.py:PipelinePredictor"
+predict: "predict.py:PipelinePredictor"

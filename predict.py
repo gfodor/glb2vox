@@ -2,8 +2,13 @@ from cog import BasePredictor, Input, Path
 import torch
 import os
 import subprocess
-from pipeline.cog_flux.predict import DevPredictor
-from pipeline.hunyuan3d_2.predict import Predictor as HunyuanPredictor
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cog_flux'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'hunyuan3d_2'))
+
+from cog_flux.predict import DevPredictor
+from hunyuan3d_2.predict import Predictor as HunyuanPredictor
 
 class PipelinePredictor(BasePredictor):
     def setup(self):
