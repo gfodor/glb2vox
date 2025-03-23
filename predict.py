@@ -48,6 +48,7 @@ class PipelinePredictor(BasePredictor):
             disable_safety_checker=disable_safety_checker,
             go_fast=go_fast,
             megapixels=megapixels,
+            image=None,  # Explicitly set to None to ensure text-to-image mode
         )
         image_path = flux_output[0]
 

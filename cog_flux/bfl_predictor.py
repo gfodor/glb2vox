@@ -536,7 +536,7 @@ class BflFp8Flux(LoraMixin):
                 "offload_flow": True,
             }
         self.fp8_pipe = FluxPipeline.load_pipeline_from_config_path(
-            f"fp8/configs/config-1-{flow_model_name}-h100.json",
+            f"cog_flux/fp8/configs/config-1-{flow_model_name}-h100.json",
             shared_models=loaded_models,
             **extra_args,  # type: ignore
         )

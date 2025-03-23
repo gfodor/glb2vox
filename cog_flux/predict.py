@@ -45,12 +45,12 @@ from transformers import (
 from weights import WeightsDownloadCache
 
 SAFETY_CACHE = Path("./safety-cache")
-FEATURE_EXTRACTOR = Path("./feature-extractor")
+FEATURE_EXTRACTOR = Path(__file__).parent / "feature-extractor"
 SAFETY_URL = "https://weights.replicate.delivery/default/sdxl/safety-1.0.tar"
 MAX_IMAGE_SIZE = 1440
 
 FALCON_MODEL_NAME = "Falconsai/nsfw_image_detection"
-FALCON_MODEL_CACHE = Path("./falcon-cache")
+FALCON_MODEL_CACHE = Path(__file__).parent / "falcon-cache"
 FALCON_MODEL_URL = (
     "https://weights.replicate.delivery/default/falconai/nsfw-image-detection.tar"
 )
