@@ -1,0 +1,59 @@
+name: Push Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: 'Comma-separated list of models to push (schnell,dev,fill-dev,canny-dev,depth-dev,redux-dev,redux-schnell,schnell-lora,dev-lora,hotswap-lora) or "all"'
+        type: string
+        default: 'all'
+
+jobs:
+  cog-safe-push:
+    # runs-on: ubuntu-latest-4-cores
+    runs-on: depot-ubuntu-22.04-4
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Install Cog
+      run: |
+        sudo curl -o /usr/local/bin/cog -L "https://github.com/replicate/cog/releases/download/v0.9.21/cog_$(uname -s)_$(uname -m)"
+        sudo chmod +x /usr/local/bin/cog
+
+    - name: cog login
+      run: |
+        echo ${{ secrets.COG_TOKEN }} | cog login --token-stdin
+
+    - name: Install cog-safe-push
+      run: |
+        pip install git+https://github.com/replicate/cog-safe-push.git
+
+    - name: Push selected models
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+      run: |
+        if [ "${{ inputs.models }}" = "all" ]; then
+          models="schnell,dev,fill-dev,canny-dev,depth-dev,redux-dev,redux-schnell,schnell-lora,dev-lora,hotswap-lora"
+        else
+          models="${{ inputs.models }}"
+        fi
+
+        for model in ${models//,/ }; do
+          echo "==="
+          echo "==="
+          echo "=== Pushing $model"
+          echo "==="
+          echo "==="
+          ./script/select.sh $model
+          cog-safe-push -vv
+          if [ "$model" != "hotswap-lora" ]; then
+            cog push r8.im/black-forest-labs/flux-$model  # to get openapi schema :..(
+          fi
+        done

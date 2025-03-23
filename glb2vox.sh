@@ -30,7 +30,7 @@ echo "Fixing texture references in MTL file..."
 sed -i '' -e 's/map_Kd \*0/map_Kd textures_img0.png/g' "${BASENAME}_with_textures.mtl"
 
 echo "Converting to VOX format..."
-wine ./poly2vox.exe /v96 /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$BASENAME.vox"
+wine /usr/local/bin/poly2vox.exe /v96 /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$BASENAME.vox"
 
 echo "Cleaning up intermediate files..."
 rm -f "${BASENAME}_with_textures.obj" "${BASENAME}_with_textures.mtl" textures_img*.png
