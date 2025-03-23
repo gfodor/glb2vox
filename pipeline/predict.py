@@ -63,7 +63,7 @@ class PipelinePredictor(BasePredictor):
 
     def run_glb2vox(self, glb_path):
         # Execute the glb2vox.sh script
-        subprocess.run(["bash", "/usr/local/bin/glb2vox.sh", str(glb_path)], check=True)
+        subprocess.run(["bash", "./glb2vox.sh", str(glb_path)], check=True)
         # Compute the VOX output path based on the GLB input path
         vox_path = str(glb_path).replace('.glb', '.vox')
         return vox_path

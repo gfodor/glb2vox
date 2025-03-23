@@ -7,8 +7,6 @@ build:
     - apt-get update && apt-get install -y assimp-utils wine-stable
     - curl -o /usr/local/bin/pget -L "https://github.com/replicate/pget/releases/download/v0.8.2/pget_linux_x86_64" && chmod +x /usr/local/bin/pget
     - curl -o /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl -L "https://huggingface.co/spaces/tencent/Hunyuan3D-2/resolve/main/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl" && pip install /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl
-    - cp /src/glb2vox.sh /usr/local/bin/glb2vox.sh
-    - cp /src/poly2vox.exe /usr/local/bin/poly2vox.exe
-    - chmod +x /usr/local/bin/glb2vox.sh
+    - mkdir -p /usr/local/bin/
 
 predict: "pipeline/predict.py:PipelinePredictor"
