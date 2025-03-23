@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Check if a file path was provided
-if [ $# -ne 1 ]; then
-  echo "Usage: $0 /path/to/model.glb"
+# Check if a file path and resolution were provided
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 /path/to/model.glb resolution"
   exit 1
 fi
 
-# Get the input file and extract base name without extension
+# Get the input file and resolution
 INPUT_FILE="$1"
+RESOLUTION="$2"
 BASENAME=$(basename "$INPUT_FILE" .glb)
 DIRNAME=$(dirname "$INPUT_FILE")
 WORKING_DIR="$DIRNAME"
@@ -32,8 +33,8 @@ sed -i '' -e 's/map_Kd \*0/map_Kd textures_img0.png/g' "${BASENAME}_with_texture
 # Get dir this script is in
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Converting to VOX format..."
-wine $DIR/poly2vox.exe /v96 /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$BASENAME.vox"
+echo "Converting to VOX format with resolution $RESOLUTION..."
+wine $DIR/../poly2vox.exe /v$RESOLUTION /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$BASENAME.vox"
 
 echo "Cleaning up intermediate files..."
 rm -f "${BASENAME}_with_textures.obj" "${BASENAME}_with_textures.mtl" textures_img*.png
