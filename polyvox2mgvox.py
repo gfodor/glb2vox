@@ -36,12 +36,13 @@ def convert_poly2vox_to_magicavoxel(poly2vox_file, magicavoxel_file):
                     voxels.append((x, y + 1, z + 1, color_index))
 
     # Prepare MagicaVoxel palette: 256 RGBA colors
-    mv_palette = [(0, 0, 0, 0)]  # Index 0: unused, set to transparent black
+    mv_palette = []  # Index 0: unused, set to transparent black
     for i in range(1, 255):
         r = palette[i * 3]
         g = palette[i * 3 + 1]
         b = palette[i * 3 + 2]
         mv_palette.append((r, g, b, 255))  # Indices 1-255: poly2vox[0-254] with A=255
+
 
     # Build MagicaVoxel chunks
     # SIZE chunk: dimensions
