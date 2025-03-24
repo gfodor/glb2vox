@@ -23,6 +23,7 @@ class PipelinePredictor(BasePredictor):
         self,
         prompt: str = Input(description="Prompt for generated image"),
         detail_level: str = Input(description="Detail level. High will try to generate a good high resolution voxel model, and low try to generate a good low resolution voxel model.", choices=["low", "high"], default="high"),
+        remove_background: bool = Input(description="Remove the background from the generated image. Useful to turn off if you want to generate a full voxel scene.", default=True),
         seed: int = Input(description="Random seed", default=1234),
         num_inference_steps: int = Input(description="Number of inference steps for Flux", default=50, ge=1, le=50),
         guidance: float = Input(description="Guidance scale for Flux", default=6.0, ge=0.0, le=10.0),
@@ -30,7 +31,6 @@ class PipelinePredictor(BasePredictor):
         steps: int = Input(description="Number of inference steps for Hunyuan", default=50, ge=20, le=50),
         guidance_scale: float = Input(description="Guidance scale for Hunyuan", default=5.5, ge=1.0, le=20.0),
         octree_resolution: int = Input(description="Octree resolution for Hunyuan", choices=[256, 384, 512], default=512),
-        remove_background: bool = Input(description="Remove the background from the generated image. Useful to turn off if you want to generate a full voxel scene.", default=True),
     ) -> list[Path]:
         # Generate snake_case filename from prompt
         def to_snake_case(text):
