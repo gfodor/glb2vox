@@ -23,7 +23,7 @@ class PipelinePredictor(BasePredictor):
         self,
         prompt: str = Input(description="Prompt for generated image"),
         seed: int = Input(description="Random seed", default=1234),
-        num_inference_steps: int = Input(description="Number of inference steps for Flux", default=28, ge=1, le=50),
+        num_inference_steps: int = Input(description="Number of inference steps for Flux", default=50, ge=1, le=50),
         guidance: float = Input(description="Guidance scale for Flux", default=6.0, ge=0.0, le=10.0),
         prompt_strength: float = Input(description="Prompt strength for img2img in Flux (only applicable if image is provided)", default=0.8, ge=0.0, le=1.0),
         steps: int = Input(description="Number of inference steps for Hunyuan", default=50, ge=20, le=50),

@@ -1,4 +1,5 @@
 import struct
+import sys
 
 def read_int(f):
     """Read a 4-byte little-endian integer from file."""
@@ -75,4 +76,8 @@ def convert_poly2vox_to_magicavoxel(poly2vox_file, magicavoxel_file):
 
 # Example usage
 if __name__ == "__main__":
-    convert_poly2vox_to_magicavoxel('input.vox', 'output.vox')
+    # Read input and output from args
+    input_vox = sys.argv[1]
+    output_vox = sys.argv[2]
+
+    convert_poly2vox_to_magicavoxel(input_vox, output_vox)

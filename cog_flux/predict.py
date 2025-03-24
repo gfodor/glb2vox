@@ -364,13 +364,13 @@ class DevPredictor(Predictor):
     def setup(self) -> None:
         self.base_setup()
         self.bf16_model = BflBf16Predictor(FLUX_DEV, offload=self.should_offload())
-        self.fp8_model = BflFp8Flux(
-            FLUX_DEV_FP8,
-            loaded_models=self.bf16_model.get_shared_models(),
-            torch_compile=True,
-            compilation_aspect_ratios=ASPECT_RATIOS,
-            offload=self.should_offload(),
-        )
+        # self.fp8_model = BflFp8Flux(
+        #     FLUX_DEV_FP8,
+        #     loaded_models=self.bf16_model.get_shared_models(),
+        #     torch_compile=True,
+        #     compilation_aspect_ratios=ASPECT_RATIOS,
+        #     offload=self.should_offload(),
+        # )
 
     def predict(
         self,

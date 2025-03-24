@@ -19,5 +19,8 @@ build:
     - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-vae-v2-0-turbo/model.fp16.safetensors --local-dir /src/checkpoints
     - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-vae-v2-0-turbo/config.yaml --local-dir /src/checkpoints
     #- mkdir -p /src/model-cache/dev && pget https://weights.replicate.delivery/default/official-models/flux/dev/dev.sft /src/model-cache/dev/dev.sft
+    #- pget -x https://weights.replicate.delivery/default/comfy-ui/rembg/u2net.onnx.tar /src/checkpoints/.u2net/
+    #- pget -x https://weights.replicate.delivery/default/tencent/Hunyuan3D-2/hunyuan3d-dit-v2-0/delight.tar /src/checkpoints/tencent/Hunyuan3D-2/hunyuan3d-delight-v2-0
+    #- pget -x https://weights.replicate.delivery/default/tencent/Hunyuan3D-2/hunyuan3d-dit-v2-0/paint.tar /src/checkpoints/tencent/Hunyuan3D-2/hunyuan3d-paint-v2-0
 
 predict: "predict.py:PipelinePredictor"
