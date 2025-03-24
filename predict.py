@@ -48,7 +48,7 @@ class PipelinePredictor(BasePredictor):
             
         # Modify prompt based on detail_level
         if detail_level == "high":
-            template = "A high quality iconic 3/4 perspective 3D render in a cel shaded game engine of {}."
+            template = "A high quality iconic 3/4 perspective 3D render of {} in a cel shaded game engine."
         elif detail_level == "low":
             template = "A isometric view of {} made out of large Minecraft cubes. Black background, floating in space."
         else:
