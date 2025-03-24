@@ -129,7 +129,7 @@ class Predictor(BasePredictor):
 
         if image is not None:
             input_image = Image.open(str(image))
-            if remove_background or input_image.mode == "RGB":
+            if remove_background:
                 input_image = self.rmbg_worker(input_image.convert('RGB'))
         else:
             raise ValueError("Image must be provided")
