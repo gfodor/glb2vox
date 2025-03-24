@@ -21,20 +21,29 @@ def convert_poly2vox_to_magicavoxel(poly2vox_file, magicavoxel_file):
         voxel_data = f.read(xsiz * ysiz * zsiz)
         palette = f.read(256 * 3)  # Assuming 256 RGB colors (768 bytes)
 
-    # Process voxel data: collect set voxels (value != 255)
+    # Define directions for checking neighboring voxels
+    directions = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+
+    # Process voxel data: collect only visible voxels
     voxels = []
     for z in range(zsiz):
         for y in range(ysiz):
             for x in range(xsiz):
-                #idx = x + y * xsiz + z * xsiz * ysiz
                 idx = z + y * zsiz + x * zsiz * ysiz
                 v = voxel_data[idx]
                 if v != 255:
-                    if v == 0:
-                        color_index = 255  # Default color for internal voxels
-                    else:
-                        color_index = v  # Surface voxels use v directly (1-254)
-                    voxels.append((x, y + 1, z + 1, color_index))
+                    # Check if voxel is visible (has at least one empty neighbor or is on boundary)
+                    is_visible = any(
+                        (nx < 0 or nx >= xsiz or ny < 0 or ny >= ysiz or nz < 0 or nz >= zsiz or
+                         voxel_data[nz + ny * zsiz + nx * zsiz * ysiz] == 255)
+                        for nx, ny, nz in [(x + dx, y + dy, z + dz) for dx, dy, dz in directions]
+                    )
+                    if is_visible:
+                        if v == 0:
+                            color_index = 255  # Default color for internal (but visible) voxels
+                        else:
+                            color_index = v  # Surface voxels use v directly (1-254)
+                        voxels.append((x, y + 1, z + 1, color_index))
 
     # Prepare MagicaVoxel palette: 256 RGBA colors
     mv_palette = []  # Index 0: unused, set to transparent black
@@ -80,5 +89,4 @@ if __name__ == "__main__":
     # Read input and output from args
     input_vox = sys.argv[1]
     output_vox = sys.argv[2]
-
     convert_poly2vox_to_magicavoxel(input_vox, output_vox)
