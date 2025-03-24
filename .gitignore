@@ -1,3 +1,5 @@
 pipeline/__pycache__
 **/__pycache__/
-.cog/
+.cog
+svox2gltf-*
+vox2svox-*

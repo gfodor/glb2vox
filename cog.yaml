@@ -9,5 +9,15 @@ build:
     - curl -o /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl -L "https://huggingface.co/spaces/tencent/Hunyuan3D-2/resolve/main/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl" && pip install /tmp/custom_rasterizer-0.1-cp310-cp310-linux_x86_64.whl
     - mkdir -p /usr/local/bin/
     - dpkg --add-architecture i386 && apt-get update && apt-get install -y wine32
+    - pget -x https://weights.replicate.delivery/default/sdxl/safety-1.0.tar /src/safety-cache
+    - pget -x https://weights.replicate.delivery/default/falconai/nsfw-image-detection.tar /src/falcon-cache
+    - pget -x https://weights.replicate.delivery/default/official-models/flux/t5/t5-v1_1-xxl.tar /src/model-cache/t5
+    - pget -x https://weights.replicate.delivery/default/official-models/flux/clip/clip-vit-large-patch14.tar /src/model-cache/clip
+    - mkdir -p /src/model-cache/ae && pget https://weights.replicate.delivery/default/official-models/flux/ae/ae.sft /src/model-cache/ae/ae.sft
+    - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-dit-v2-0-turbo/model.fp16.safetensors --local-dir /src/checkpoints
+    - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-dit-v2-0-turbo/config.yaml --local-dir /src/checkpoints
+    - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-vae-v2-0-turbo/model.fp16.safetensors --local-dir /src/checkpoints
+    - huggingface-cli download tencent/Hunyuan3D-2 hunyuan3d-vae-v2-0-turbo/config.yaml --local-dir /src/checkpoints
+    #- mkdir -p /src/model-cache/dev && pget https://weights.replicate.delivery/default/official-models/flux/dev/dev.sft /src/model-cache/dev/dev.sft
 
 predict: "predict.py:PipelinePredictor"

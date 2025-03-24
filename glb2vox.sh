@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Check if a file path and resolution were provided
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 /path/to/model.glb resolution"
+# Check if a file path, resolution, and output_vox were provided
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 /path/to/model.glb resolution /path/to/output.vox"
   exit 1
 fi
 
-# Get the input file and resolution
+# Get the input file, resolution, and output_vox
 INPUT_FILE="$1"
 RESOLUTION="$2"
+OUTPUT_VOX="$3"
+
+# Extract basename from INPUT_FILE for intermediate files
 BASENAME=$(basename "$INPUT_FILE" .glb)
 DIRNAME=$(dirname "$INPUT_FILE")
 WORKING_DIR="$DIRNAME"
@@ -34,9 +37,13 @@ sed -i '' -e 's/map_Kd \*0/map_Kd textures_img0.png/g' "${BASENAME}_with_texture
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "Converting to VOX format with resolution $RESOLUTION..."
-wine $DIR/../poly2vox.exe /v$RESOLUTION /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$BASENAME.vox"
+wine $DIR/../poly2vox.exe /v$RESOLUTION /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "$OUTPUT_VOX"
+
+echo "Generating SVOX and GLTF..."
+$DIR/../vox2svox "$OUTPUT_VOX" "${OUTPUT_VOX}.svox"
+$DIR/../svox2gltf "${OUTPUT_VOX}.svox" "${OUTPUT_VOX}.gltf"
 
 echo "Cleaning up intermediate files..."
 rm -f "${BASENAME}_with_textures.obj" "${BASENAME}_with_textures.mtl" textures_img*.png
 
-echo "Conversion complete: $BASENAME.vox"
+echo "Conversion complete: $OUTPUT_VOX and ${OUTPUT_VOX}.gltf"
