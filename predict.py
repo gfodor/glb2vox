@@ -48,7 +48,7 @@ class PipelinePredictor(BasePredictor):
             
         # Modify prompt based on detail_level
         if detail_level == "high":
-            template = "A high quality iconic 3/4 perspective 3D render of {} in a cel shaded game engine."
+            template = "A high quality iconic 3/4 perspective 3D render in a cel shaded game engine of {}."
         elif detail_level == "low":
             template = "A isometric view of {} made out of large Minecraft cubes. Black background, floating in space."
         else:
@@ -104,9 +104,11 @@ class PipelinePredictor(BasePredictor):
         
         # First run the conversions with temporary filenames
         temp_vox_paths = []
-        for size, res in zip(sizes, resolutions):
+        for i, (size, res) in enumerate(zip(sizes, resolutions)):
             temp_output_vox = f"{temp_base}_{size}.vox"
-            self.run_glb2vox(glb_path, res, temp_output_vox)
+            # Only generate GLTF/GLB for the first (large) resolution
+            skip_gltf_steps = (i > 0)  # Skip for medium and small sizes
+            self.run_glb2vox(glb_path, res, temp_output_vox, skip_gltf_steps)
             temp_vox_paths.append(temp_output_vox)
         
         # Create output filenames with descriptive names
@@ -130,5 +132,6 @@ class PipelinePredictor(BasePredictor):
         # Return the final paths
         return [Path(final_glb_path)] + [Path(vox_path) for vox_path in final_vox_paths]
 
-    def run_glb2vox(self, glb_path, resolution, output_vox):
-        subprocess.run(["bash", "./glb2vox.sh", str(glb_path), str(resolution), str(output_vox)], check=True)
+    def run_glb2vox(self, glb_path, resolution, output_vox, skip_gltf_steps=False):
+        subprocess.run(["bash", "./glb2vox.sh", str(glb_path), str(resolution), str(output_vox), 
+                         "true" if skip_gltf_steps else "false"], check=True)

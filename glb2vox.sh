@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Check if a file path, resolution, and output_vox were provided
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 /path/to/model.glb resolution /path/to/output.vox"
+# Check if a file path, resolution, output_vox and optional flag to skip GLTF/GLB steps were provided
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 /path/to/model.glb resolution /path/to/output.vox [skip_gltf_steps]"
   exit 1
 fi
 
@@ -10,6 +10,7 @@ fi
 INPUT_FILE="$1"
 RESOLUTION="$2"
 OUTPUT_VOX="$3"
+SKIP_GLTF_STEPS="${4:-false}"
 
 # Extract basename from INPUT_FILE for intermediate files
 BASENAME=$(basename "$INPUT_FILE" .glb)
@@ -42,14 +43,20 @@ wine $DIR/../poly2vox.exe /v$RESOLUTION /t "${BASENAME}_with_textures.mtl" "${BA
 echo "Converting to MagicaVoxel format..."
 python $DIR/../polyvox2mgvox.py tmp.vox "../$OUTPUT_VOX"
 
-echo "Generating SVOX and GLTF..."
-$DIR/../vox2svox "../$OUTPUT_VOX" "../${OUTPUT_VOX}.svox"
-$DIR/../svox2gltf "../${OUTPUT_VOX}.svox" "../${OUTPUT_VOX}.gltf"
+# Only generate SVOX, GLTF and GLB if not skipping these steps
+if [ "$SKIP_GLTF_STEPS" != "true" ]; then
+  echo "Generating SVOX and GLTF..."
+  $DIR/../vox2svox "../$OUTPUT_VOX" "../${OUTPUT_VOX}.svox"
+  $DIR/../svox2gltf "../${OUTPUT_VOX}.svox" "../${OUTPUT_VOX}.gltf"
 
-echo "Converting GLTF to GLB..."
-gltf-pipeline -i "../${OUTPUT_VOX}.gltf" -o "../${OUTPUT_VOX}.glb"
+  echo "Converting GLTF to GLB..."
+  gltf-pipeline -i "../${OUTPUT_VOX}.gltf" -o "../${OUTPUT_VOX}.glb"
+  
+  echo "Conversion complete: $OUTPUT_VOX, ${OUTPUT_VOX}.gltf, and ${OUTPUT_VOX}.glb"
+else
+  echo "Skipping SVOX, GLTF, and GLB generation as requested"
+  echo "Conversion complete: $OUTPUT_VOX"
+fi
 
 echo "Cleaning up intermediate files..."
 rm -f "${BASENAME}_with_textures.obj" "${BASENAME}_with_textures.mtl" textures_img*.png tmp.vox
-
-echo "Conversion complete: $OUTPUT_VOX, ${OUTPUT_VOX}.gltf, and ${OUTPUT_VOX}.glb"
