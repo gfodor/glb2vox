@@ -44,6 +44,7 @@ def convert_poly2vox_to_magicavoxel(poly2vox_file, magicavoxel_file):
         b = palette[i * 3 + 2]
         mv_palette.append((r, g, b, 255))  # Indices 1-255: poly2vox[0-254] with A=255
 
+    mv_palette.append((0, 0, 0, 0))  # Indices 1-255: poly2vox[0-254] with A=255
 
     # Build MagicaVoxel chunks
     # SIZE chunk: dimensions
