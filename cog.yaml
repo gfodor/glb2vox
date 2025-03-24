@@ -22,5 +22,8 @@ build:
     #- pget -x https://weights.replicate.delivery/default/comfy-ui/rembg/u2net.onnx.tar /src/checkpoints/.u2net/
     #- pget -x https://weights.replicate.delivery/default/tencent/Hunyuan3D-2/hunyuan3d-dit-v2-0/delight.tar /src/checkpoints/tencent/Hunyuan3D-2/hunyuan3d-delight-v2-0
     #- pget -x https://weights.replicate.delivery/default/tencent/Hunyuan3D-2/hunyuan3d-dit-v2-0/paint.tar /src/checkpoints/tencent/Hunyuan3D-2/hunyuan3d-paint-v2-0
+    - curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+    - apt-get install -y nodejs
+    - npm install -g gltf-pipeline
 
 predict: "predict.py:PipelinePredictor"

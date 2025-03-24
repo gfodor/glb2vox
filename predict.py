@@ -22,6 +22,7 @@ class PipelinePredictor(BasePredictor):
     def predict(
         self,
         prompt: str = Input(description="Prompt for generated image"),
+        detail_level: str = Input(description="Detail level. High will try to generate a good high resolution voxel model, and low try to generate a good low resolution voxel model.", choices=["low", "high"], default="high"),
         seed: int = Input(description="Random seed", default=1234),
         num_inference_steps: int = Input(description="Number of inference steps for Flux", default=50, ge=1, le=50),
         guidance: float = Input(description="Guidance scale for Flux", default=6.0, ge=0.0, le=10.0),
@@ -29,8 +30,22 @@ class PipelinePredictor(BasePredictor):
         steps: int = Input(description="Number of inference steps for Hunyuan", default=50, ge=20, le=50),
         guidance_scale: float = Input(description="Guidance scale for Hunyuan", default=5.5, ge=1.0, le=20.0),
         octree_resolution: int = Input(description="Octree resolution for Hunyuan", choices=[256, 384, 512], default=512),
-        detail_level: str = Input(description="Detail level", choices=["low", "high"], default="high"),
+        remove_background: bool = Input(description="Remove the background from the generated image. Useful to turn off if you want to generate a full voxel scene.", default=True),
     ) -> list[Path]:
+        # Generate snake_case filename from prompt
+        def to_snake_case(text):
+            # Convert to lowercase
+            text = text.lower()
+            # Replace spaces and special characters with underscores
+            text = ''.join(c if c.isalnum() else '_' for c in text)
+            # Replace multiple underscores with a single one
+            text = '_'.join(filter(None, text.split('_')))
+            # Ensure it doesn't start with a digit
+            if text and text[0].isdigit():
+                text = 'obj_' + text
+            # Limit length to prevent excessively long filenames
+            return text[:50]
+            
         # Modify prompt based on detail_level
         if detail_level == "high":
             template = "A high quality iconic 3/4 perspective 3D render of {} in a cel shaded game engine."
@@ -71,25 +86,49 @@ class PipelinePredictor(BasePredictor):
             guidance_scale=guidance_scale,
             seed=seed,
             octree_resolution=octree_resolution,
-            remove_background=False,
+            remove_background=remove_background,
         )
         glb_path = hunyuan_output.mesh
 
+        # Create a descriptive filename base from the prompt
+        filename_base = to_snake_case(prompt)
+        output_dir = os.path.dirname(glb_path)
+        
         # Determine resolutions based on detail_level
         if detail_level == "high":
             resolutions = [96, 80, 64]
         elif detail_level == "low":
-            resolutions = [48, 32, 24]
+            resolutions = [64, 48, 32]
         sizes = ['large', 'medium', 'small']
-        base = os.path.splitext(glb_path)[0]
+        temp_base = os.path.splitext(glb_path)[0]
+        
+        # First run the conversions with temporary filenames
+        temp_vox_paths = []
         for size, res in zip(sizes, resolutions):
-            output_vox = f"{base}_{size}.vox"
-            self.run_glb2vox(glb_path, res, output_vox)
-
-        # Compute paths for output
-        gltf_path = f"{base}_large.vox.gltf"
-        vox_paths = [f"{base}_{size}.vox" for size in sizes]
-        return [Path(gltf_path)] + [Path(vox_path) for vox_path in vox_paths]
+            temp_output_vox = f"{temp_base}_{size}.vox"
+            self.run_glb2vox(glb_path, res, temp_output_vox)
+            temp_vox_paths.append(temp_output_vox)
+        
+        # Create output filenames with descriptive names
+        final_glb_path = os.path.join(output_dir, f"{filename_base}.vox.glb")
+        final_vox_paths = []
+        
+        # Rename the files to use descriptive filenames
+        for size, temp_vox_path in zip(sizes, temp_vox_paths):
+            final_vox_path = os.path.join(output_dir, f"{filename_base}_{size}.vox")
+            os.rename(temp_vox_path, final_vox_path)
+            final_vox_paths.append(final_vox_path)
+            
+            # Also rename the .gltf file for the first one (large)
+            if size == 'large':
+                temp_gltf_path = f"{temp_vox_path}.gltf"
+                temp_glb_path = f"{temp_vox_path}.glb"
+                final_gltf_path = os.path.join(output_dir, f"{filename_base}.vox.gltf")
+                os.rename(temp_gltf_path, final_gltf_path)
+                os.rename(temp_glb_path, final_glb_path)
+        
+        # Return the final paths
+        return [Path(final_glb_path)] + [Path(vox_path) for vox_path in final_vox_paths]
 
     def run_glb2vox(self, glb_path, resolution, output_vox):
         subprocess.run(["bash", "./glb2vox.sh", str(glb_path), str(resolution), str(output_vox)], check=True)

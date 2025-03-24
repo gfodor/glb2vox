@@ -40,13 +40,16 @@ echo "Converting to VOX format with resolution $RESOLUTION..."
 wine $DIR/../poly2vox.exe /v$RESOLUTION /t "${BASENAME}_with_textures.mtl" "${BASENAME}_with_textures.obj" "tmp.vox"
 
 echo "Converting to MagicaVoxel format..."
-python $DIR/../polyvox2mgvox.py tmp.vox $OUTPUT_VOX
+python $DIR/../polyvox2mgvox.py tmp.vox "../$OUTPUT_VOX"
 
 echo "Generating SVOX and GLTF..."
-$DIR/../vox2svox "$OUTPUT_VOX" "${OUTPUT_VOX}.svox"
-$DIR/../svox2gltf "${OUTPUT_VOX}.svox" "${OUTPUT_VOX}.gltf"
+$DIR/../vox2svox "../$OUTPUT_VOX" "../${OUTPUT_VOX}.svox"
+$DIR/../svox2gltf "../${OUTPUT_VOX}.svox" "../${OUTPUT_VOX}.gltf"
+
+echo "Converting GLTF to GLB..."
+gltf-pipeline -i "../${OUTPUT_VOX}.gltf" -o "../${OUTPUT_VOX}.glb"
 
 echo "Cleaning up intermediate files..."
 rm -f "${BASENAME}_with_textures.obj" "${BASENAME}_with_textures.mtl" textures_img*.png tmp.vox
 
-echo "Conversion complete: $OUTPUT_VOX and ${OUTPUT_VOX}.gltf"
+echo "Conversion complete: $OUTPUT_VOX, ${OUTPUT_VOX}.gltf, and ${OUTPUT_VOX}.glb"
